@@ -19,8 +19,18 @@ void my_printf(char *phrase, ...) {
             // %[flags][width][.precision][length]type
             // flags are -, +, , 0, ', #
             int plus_flag = 0;
-            if (*phrase == '+'){
+            if (*phrase == '+') {
                 plus_flag = 1;
+                phrase++;
+            }
+
+            // width field the number is the minimum number of chars in output
+            // get the number to be used later
+            int width = 0;
+            // gets the number in a char form, need it in int to interpret how many
+            while (*phrase >= '0' && *phrase <= '9') {
+                // get the int 
+                width = (width * 10) + *phrase - '0';
                 phrase++;
             }
 
@@ -62,6 +72,14 @@ void my_printf(char *phrase, ...) {
                 //str[index] = '\0';
                 //index++;
                 
+                // over here need to check how many less than width and then put blank spaces
+                if (index<width) {
+                    int width_min = width-index;
+                    for (int i=0; i<width_min; i++) {
+                        putchar(' ');
+                    }
+                }
+
                 // now need to putchar() the chars - backwards
                 for (int i = index-1; i >= 0; i--) {
                     //printf("here");
@@ -73,16 +91,21 @@ void my_printf(char *phrase, ...) {
             // error if not an ascii char
             if (*phrase == 'c') {
                 char character = va_arg(ap, int); // get the next argument, the parameter is an int idk why can ask that
+                // deal with width here
+                for (int i=0; i<width-1; i++)
+                    putchar(' ');
                 putchar(character);
             }
             // s should be the same thing just multiple character so will move through it and print one by one
             if (*phrase == 's') {
                 char *string = va_arg(ap, char*); // get the next argument
+                
                 while (*string != '\0') {
                     putchar(*string);
                     string++;
                 }
             }
+                
             // if x: unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case. could be similar to d
             // use 16 instead of 10
             // right now not working fully
@@ -98,12 +121,13 @@ void my_printf(char *phrase, ...) {
                     str[index] = '0';
                     index++;
                 }
-                
+                // have a list of the hex digits
+                char hex[16] = "0123456789abcdef";
                 // turn the into a string, but backwards
                 while (unsigned_int > 0) {
                     int temp = unsigned_int % 16;
                     // add this digit to the string
-                    str[index] = '0' + temp;
+                    str[index] = hex[temp];
                     index++;
                     // get rid of last digit
                     unsigned_int /= 16;
@@ -124,63 +148,87 @@ void my_printf(char *phrase, ...) {
 }
 
 int main() {
-    printf("Normal printf(): ");
-    printf("Hello World %d\n", 10001);
+    // printf("Normal printf(): ");
+    // printf("Hello World %d\n", 10001);
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %d\n", 10001);
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %d\n", 10001);
 
-    printf("Normal printf(): ");
-    printf("Hello World %d what is your age %d\n", 'f', 3);
+    // printf("Normal printf(): ");
+    // printf("Hello World %d what is your age %d\n", 'f', 3);
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %d what is your age %d\n", 'f', 3);
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %d what is your age %d\n", 'f', 3);
 
-    printf("Normal printf(): ");
-    printf("Hello World %d\n", 0);
+    // printf("Normal printf(): ");
+    // printf("Hello World %d\n", 0);
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %d\n", 0);
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %d\n", 0);
 
-    printf("Normal printf(): ");
-    printf("Hello World %d\n", -55);
+    // printf("Normal printf(): ");
+    // printf("Hello World %d\n", -55);
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %d\n", -55);
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %d\n", -55);
 
-    printf("Normal printf(): ");
-    printf("Hello World %+d\n", 55);
+    // printf("Normal printf(): ");
+    // printf("Hello World %+d\n", 55);
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %+d\n", 55);
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %+d\n", 55);
 
-    // c
-    printf("Normal printf(): ");
-    printf("Hello World %c\n", 'c');
+    // // c
+    // printf("Normal printf(): ");
+    // printf("Hello World %c\n", 'c');
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %c\n", 'c');
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %c\n", 'c');
 
-    // s
-    printf("Normal printf(): ");
-    printf("Hello World %s\n", "string");
+    // // s
+    // printf("Normal printf(): ");
+    // printf("Hello World %s\n", "string");
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %s\n", "string");
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %s\n", "string");
 
-    // trying all of them together
-    printf("Normal printf(): ");
-    printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
+    // // trying all of them together
+    // printf("Normal printf(): ");
+    // printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
 
-    printf("Fake printf(): ");
-    my_printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
+    // printf("Fake printf(): ");
+    // my_printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
 
-    // x
-    printf("Normal printf(): ");
-    printf("Hello World %x\n", 26);
+    // // x
+    // printf("Normal printf(): ");
+    // printf("Hello World %x\n", 26);
 
-    printf("Fake printf(): ");
-    my_printf("Hello World %x\n", 26);
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %x\n", 26);
+
+    // printf("Normal printf(): ");
+    // printf("Hello World %x\n", 689);
+
+    // printf("Fake printf(): ");
+    // my_printf("Hello World %x\n", 689);
+
+    printf("Normal printf(): \n");
+    printf("Hello World %10d whats up\n", 689);
+
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10d whats up\n", 689);
+
+    printf("Normal printf(): \n");
+    printf("Hello World %d\n", 689);
+
+    printf("Fake printf(): \n");
+    my_printf("Hello World %d\n", 689);
+
+    printf("Normal printf(): \n");
+    printf("Hello World %10c\n", 'f');
+
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10c\n", 'f');
 
 
     return 0;
