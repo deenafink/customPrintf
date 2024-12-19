@@ -24,6 +24,13 @@ void my_printf(char *phrase, ...) {
                 phrase++;
             }
 
+            int zeroes = 0;
+            // check if 0 and then do zeros instead of spaces
+            if (*phrase == '0') {
+                zeroes = 1;
+                phrase++;
+            }
+
             // width field the number is the minimum number of chars in output
             // get the number to be used later
             int width = 0;
@@ -33,12 +40,30 @@ void my_printf(char *phrase, ...) {
                 phrase++;
             }
 
-            // gets the number in a char form, need it in int to interpret how many
+            // gets the number in a char form, need it in int to interpret how many for width
             while (*phrase >= '0' && *phrase <= '9') {
                 // get the int 
                 width = (width * 10) + *phrase - '0';
                 phrase++;
             }
+
+            int precision = 0;
+            // get the precision field
+            if (*phrase == '.') {
+                phrase++; // get the next which is either an int or a star
+                if (*phrase == '*') { // if start get the next argument
+                    precision = va_arg(ap, int);
+                    phrase++;
+                }
+                else {
+                    while (*phrase >= '0' && *phrase <= '9') {
+                        // the current multiplied by 10 and then add in int
+                        precision = (precision * 10) + *phrase - '0';
+                        phrase++;
+                    }
+                }
+            }
+
 
             if (*phrase == 'd') {
                 int num = va_arg(ap, int); // get the next argument
@@ -82,7 +107,10 @@ void my_printf(char *phrase, ...) {
                 if (index<width) {
                     int width_min = width-index;
                     for (int i=0; i<width_min; i++) {
-                        putchar(' ');
+                        if (zeroes == 0)
+                            putchar(' ');
+                        else
+                            putchar('0');
                     }
                 }
 
@@ -116,18 +144,38 @@ void my_printf(char *phrase, ...) {
                 //restore the pointer to the original point in memory
                 string = copy;
 
-                // insert the spaces for width
-                if (width > len) {
-                    int diff = width-len;
-                    for (int i=0; i<diff; i++)
-                        putchar(' ');
+                // deal with precision
+                if (precision > 0) {
+                    // width and precision together
+                    if (width > precision) {
+                        int diff = width-precision;
+                        for (int i=0; i<diff; i++)
+                            putchar(' ');
+                    }
+                    
+                    int num = 0; // this is for precision
+                    while (*string != '\0' && num < precision) {
+                        putchar(*string);
+                        string++;
+                        num++;
+                    }
                 }
-                // add the letters now
-                while (*string != '\0') {
-                    putchar(*string);
-                    string++;
+
+                // insert the spaces for width (without precision specified)
+                // update: check if width is greater than precision, not len
+                else {
+                    if (width > len) {
+                        int diff = width-len;
+                        for (int i=0; i<diff; i++)
+                            putchar(' ');
+                    }
+                    // add the letters now
+                    while (*string != '\0') {
+                        putchar(*string);
+                        string++;
+                    }
                 }
-            }
+            } 
                 
             // if x: unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case. could be similar to d
             // use 16 instead of 10
@@ -160,7 +208,10 @@ void my_printf(char *phrase, ...) {
                 if (index<width) {
                     int width_min = width-index;
                     for (int i=0; i<width_min; i++) {
-                        putchar(' ');
+                        if (zeroes == 0)
+                            putchar(' ');
+                        else
+                            putchar('0');
                     }
                 }
                 
@@ -243,31 +294,31 @@ int main() {
     // printf("Fake printf(): ");
     // my_printf("Hello World %x\n", 689);
 
-    printf("Normal printf(): \n");
-    printf("Hello World %10d whats up\n", 689);
+    // printf("Normal printf(): \n");
+    // printf("Hello World %10d whats up\n", 689);
 
-    printf("Fake printf(): \n");
-    my_printf("Hello World %10d whats up\n", 689);
+    // printf("Fake printf(): \n");
+    // my_printf("Hello World %10d whats up\n", 689);
 
-    printf("Normal printf(): \n");
-    printf("Hello World %d\n", 689);
+    // printf("Normal printf(): \n");
+    // printf("Hello World %d\n", 689);
 
-    printf("Fake printf(): \n");
-    my_printf("Hello World %d\n", 689);
+    // printf("Fake printf(): \n");
+    // my_printf("Hello World %d\n", 689);
 
-    printf("Normal printf(): \n");
-    printf("Hello World %10c\n", 'f');
+    // printf("Normal printf(): \n");
+    // printf("Hello World %10c\n", 'f');
 
-    printf("Fake printf(): \n");
-    my_printf("Hello World %10c\n", 'f');
+    // printf("Fake printf(): \n");
+    // my_printf("Hello World %10c\n", 'f');
 
-    printf("Normal printf(): \n");
-    printf("Hello World %10s\n", "face");
+    // printf("Normal printf(): \n");
+    // printf("Hello World %10s\n", "face");
 
-    printf("Fake printf(): \n");
-    my_printf("Hello World %10s\n", "face");
+    // printf("Fake printf(): \n");
+    // my_printf("Hello World %10s\n", "face");
 
-    // width with x
+    // // width with x
     printf("Normal printf(): \n");
     printf("%10x\n", 90);
 
@@ -280,6 +331,33 @@ int main() {
 
     printf("fake printf(): \n");
     my_printf("%*d\n", 3, 10);
+
+    //width and precision
+    printf("Normal printf(): \n");
+    printf("Hello World %10.3s\n", "face");
+
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10.3s\n", "face");
+
+    // precision
+    printf("Normal printf(): \n");
+    printf("%.*s\n", 3, "abcdef");
+
+    printf("Fake printf(): \n");
+    my_printf("%.*s\n", 3, "abcdef");
+
+    // width with zero flag
+    printf("Normal printf(): \n");
+    printf("%04d\n", 7);
+
+    printf("Fake printf(): \n");
+    my_printf("%04d\n", 7);
+
+    printf("Normal printf(): \n");
+    printf("%04x\n", 70);
+
+    printf("Fake printf(): \n");
+    my_printf("%04x\n", 70);
 
     return 0;
 }
