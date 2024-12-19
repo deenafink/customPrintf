@@ -27,6 +27,12 @@ void my_printf(char *phrase, ...) {
             // width field the number is the minimum number of chars in output
             // get the number to be used later
             int width = 0;
+            // first check if is a star (*), if so- get the next argument
+            if (*phrase == '*') {
+                width = va_arg(ap, int);
+                phrase++;
+            }
+
             // gets the number in a char form, need it in int to interpret how many
             while (*phrase >= '0' && *phrase <= '9') {
                 // get the int 
@@ -99,7 +105,24 @@ void my_printf(char *phrase, ...) {
             // s should be the same thing just multiple character so will move through it and print one by one
             if (*phrase == 's') {
                 char *string = va_arg(ap, char*); // get the next argument
-                
+                char *copy = string;
+
+                // get length of the string
+                int len = 0;
+                while (*string != '\0') {
+                    len++;
+                    string++;
+                }
+                //restore the pointer to the original point in memory
+                string = copy;
+
+                // insert the spaces for width
+                if (width > len) {
+                    int diff = width-len;
+                    for (int i=0; i<diff; i++)
+                        putchar(' ');
+                }
+                // add the letters now
                 while (*string != '\0') {
                     putchar(*string);
                     string++;
@@ -131,6 +154,14 @@ void my_printf(char *phrase, ...) {
                     index++;
                     // get rid of last digit
                     unsigned_int /= 16;
+                }
+
+                // over here need to check how many less than width and then put blank spaces
+                if (index<width) {
+                    int width_min = width-index;
+                    for (int i=0; i<width_min; i++) {
+                        putchar(' ');
+                    }
                 }
                 
                 // now need to putchar() the chars - backwards
@@ -230,6 +261,25 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("Hello World %10c\n", 'f');
 
+    printf("Normal printf(): \n");
+    printf("Hello World %10s\n", "face");
+
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10s\n", "face");
+
+    // width with x
+    printf("Normal printf(): \n");
+    printf("%10x\n", 90);
+
+    printf("fake printf(): \n");
+    my_printf("%10x\n", 90);
+
+    // checking with the star*
+    printf("Normal printf(): \n");
+    printf("%*d\n", 3, 10);
+
+    printf("fake printf(): \n");
+    my_printf("%*d\n", 3, 10);
 
     return 0;
 }
