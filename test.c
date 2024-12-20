@@ -103,52 +103,37 @@ void my_printf(char *phrase, ...) {
                 //str[index] = '\0';
                 //index++;
                 // deal with precision
+                int diff = 0;
+                int totalWidth = 0;
                 if (precision > 0) {
-                    int diff = 0;
-                    int totalWidth = 0;
                     // if the number of digits is less than the precision number, add the difference in zeroes
                     // add that number to the index
                     if (index < precision) {
                         diff = precision-index;
                         totalWidth = index + diff;
                     }
+                }
                 
                 
-                    // over here need to check how many less than width and then put blank spaces
-                    if (totalWidth<width) {
-                        int width_min = width-totalWidth;
-                        for (int i=0; i<width_min; i++)
+                // over here need to check how many less than width and then put blank spaces
+                if (totalWidth<width) {
+                    int width_min = width-totalWidth;
+                    for (int i=0; i<width_min; i++) {
+                        if (zeroes == 0)
                             putchar(' ');
-                    }         
-                    // now need to place zeroes for precision
-                    for (int i=0; i<diff; i++) {
-                        putchar('0');
-                    }
-
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
+                        else
+                            putchar('0');
                     }
                 }
+                // now need to place zeroes for precision
+                for (int i=0; i<diff; i++) {
+                    putchar('0');
+                }
 
-                // over here need to check how many less than width and then put blank spaces
-                else {
-                    if (index<width) {
-                        int width_min = width-index;
-                        for (int i=0; i<width_min; i++) {
-                            if (zeroes == 0)
-                                putchar(' ');
-                            else
-                                putchar('0');
-                        }
-                    }
-
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
-                    }
+                // now need to putchar() the chars - backwards
+                for (int i = index-1; i >= 0; i--) {
+                    //printf("here");
+                    putchar(str[i]);
                 }
             }
             // prints it as a char
@@ -235,53 +220,20 @@ void my_printf(char *phrase, ...) {
                     unsigned_int /= 16;
                 }
 
-                // deal with precision
-                if (precision > 0) {
-                    int diff = 0;
-                    int totalWidth = 0;
-                    // if the number of digits is less than the precision number, add the difference in zeroes
-                    // add that number to the index
-                    if (index < precision) {
-                        diff = precision-index;
-                        totalWidth = index + diff;
-                    }
-                
-                
-                    // over here need to check how many less than width and then put blank spaces
-                    if (totalWidth<width) {
-                        int width_min = width-totalWidth;
-                        for (int i=0; i<width_min; i++)
+                // over here need to check how many less than width and then put blank spaces
+                if (index<width) {
+                    int width_min = width-index;
+                    for (int i=0; i<width_min; i++) {
+                        if (zeroes == 0)
                             putchar(' ');
-                    }         
-                    // now need to place zeroes for precision
-                    for (int i=0; i<diff; i++) {
-                        putchar('0');
-                    }
-
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
+                        else
+                            putchar('0');
                     }
                 }
-
-                // over here need to check how many less than width and then put blank spaces
-                else {
-                    if (index<width) {
-                        int width_min = width-index;
-                        for (int i=0; i<width_min; i++) {
-                            if (zeroes == 0)
-                                putchar(' ');
-                            else
-                                putchar('0');
-                        }
-                    }
-
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
-                    }
+                
+                // now need to putchar() the chars - backwards
+                for (int i = index-1; i >= 0; i--) {
+                    putchar(str[i]);
                 }
             }
         }
@@ -373,14 +325,14 @@ int main() {
     // printf("Normal printf(): \n");
     // printf("Hello World %10c\n", 'f');
 
-    printf("Fake printf(): \n");
-    my_printf("Hello World %10c\n", 'f');
+    // printf("Fake printf(): \n");
+    // my_printf("Hello World %10c\n", 'f');
 
-    printf("Normal printf(): \n");
-    printf("Hello World %10s\n", "face");
+    // printf("Normal printf(): \n");
+    // printf("Hello World %10s\n", "face");
 
-    printf("Fake printf(): \n");
-    my_printf("Hello World %10s\n", "face");
+    // printf("Fake printf(): \n");
+    // my_printf("Hello World %10s\n", "face");
 
     // // width with x
     printf("Normal printf(): \n");
@@ -443,19 +395,7 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("%7.5d\n", 70);
 
-    // 0 flag with precision and width
-    printf("Normal printf(): \n");
-    printf("%07.5d\n", 70);
-
-    printf("Fake printf(): \n");
-    my_printf("%07.5d\n", 70);
-
-    // trying precision with x
-    printf("Normal printf(): \n");
-    printf("%5.3x\n", 70);
-
-    printf("Fake printf(): \n");
-    my_printf("%5.3x\n", 70);
+    printf("%7.6x\n", 70);
 
     return 0;
 }
