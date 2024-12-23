@@ -24,6 +24,12 @@ void my_printf(char *phrase, ...) {
                 phrase++;
             }
 
+            int blank_flag = 0;
+            if (*phrase == ' ') {
+                blank_flag = 1;
+                phrase++;
+            }
+
             int zeroes = 0;
             // check if 0 and then do zeros instead of spaces
             if (*phrase == '0') {
@@ -69,6 +75,7 @@ void my_printf(char *phrase, ...) {
                 int num = va_arg(ap, int); // get the next argument
                 // cast it into an int
                 int ascii = (int) num;
+                int negative = 0;
                 // sizes can only be 10 places anyway
                 char str[12]; // later want to turn the int into a str to print each digit individually
                 int index = 0;
@@ -81,14 +88,15 @@ void my_printf(char *phrase, ...) {
 
                 // if negative number
                 if (ascii < 0) {
-                    putchar('-');
-                    ascii *= -1;
+                    //putchar('-');
+                    negative = 1; // set negative to 1
+                    ascii *= -1; // to turn the rest of the number positive
                 }
                 // if positive number and the + flag is there
-                else {
-                    if (plus_flag == 1)
-                        putchar('+');
-                }
+                // else {
+                //     if (plus_flag == 1)
+                //         //putchar('+');
+                // }
                 
                 // turn the into a string, but backwards
                 while (ascii > 0) {
@@ -99,6 +107,17 @@ void my_printf(char *phrase, ...) {
                     // get rid of last digit
                     ascii /= 10;
                 }
+
+                // since it gets entered backwards, this is where would add the positive or negative to the str
+                if (negative == 1) {
+                    str[index] = '-';
+                    index++;
+                }
+                if (plus_flag == 1 && negative == 0) {
+                    str[index] = '+';
+                    index++;
+                }
+
                 // add a teminal char
                 //str[index] = '\0';
                 //index++;
@@ -106,13 +125,17 @@ void my_printf(char *phrase, ...) {
                 if (precision > 0) {
                     int diff = 0;
                     int totalWidth = 0;
+                    // check if blank flag here bc before width and precision
+                    if (blank_flag == 1) {
+                        totalWidth += 1;
+                    }
+                    
                     // if the number of digits is less than the precision number, add the difference in zeroes
                     // add that number to the index
                     if (index < precision) {
                         diff = precision-index;
                         totalWidth = index + diff;
                     }
-                
                 
                     // over here need to check how many less than width and then put blank spaces
                     if (totalWidth<width) {
@@ -211,7 +234,7 @@ void my_printf(char *phrase, ...) {
             // if x: unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case. could be similar to d
             // use 16 instead of 10
             // right now not working fully
-            if (*phrase == 'x') {
+            if (*phrase == 'x' || *phrase == 'X') {
                 unsigned int unsigned_int = va_arg(ap, int); // get the next argument, the parameter is an int idk why can ask that
                 
                 // sizes can only be 10 places anyway
@@ -417,17 +440,13 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("%04d\n", 7);
 
+    printf("width with zero flag\n");
+
     printf("Normal printf(): \n");
     printf("%04x\n", 70);
 
     printf("Fake printf(): \n");
     my_printf("%04x\n", 70);
-
-    printf("Normal printf(): \n");
-    printf("%04d\n", 70);
-
-    printf("Fake printf(): \n");
-    my_printf("%04d\n", 70);
 
     // check precision for d
     printf("Normal printf(): \n");
@@ -456,6 +475,27 @@ int main() {
 
     printf("Fake printf(): \n");
     my_printf("%5.3x\n", 70);
+
+
+    // more flags
+    printf("Normal printf(): \n");
+    printf("%04X\n",3);
+
+    printf("Fake printf(): \n");
+    my_printf("%04X\n",3);
+
+    // deal with flags with width
+    printf("Normal printf(): \n");
+    printf("%+2d\n", 555);
+
+    printf("Fake printf(): \n");
+    my_printf("%+2d\n", 555);
+
+    printf("Normal printf(): \n");
+    printf("%6d\n", -400);
+
+    printf("Fake printf(): \n");
+    my_printf("%6d\n", -400);
 
     return 0;
 }
