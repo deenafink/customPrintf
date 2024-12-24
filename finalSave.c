@@ -83,11 +83,12 @@ void my_printf(char *phrase, ...) {
             if (*phrase == 'd') {
                 int num = va_arg(ap, int); // get the next argument
                 // cast it into an int
-                int ascii = num;
+                int ascii = (int) num;
                 int negative = 0;
                 // sizes can only be 10 places anyway
                 char str[12]; // later want to turn the int into a str to print each digit individually
                 int index = 0;
+                int length = 0;
 
                 // edge case of 0
                 if (ascii == 0) {
@@ -97,6 +98,7 @@ void my_printf(char *phrase, ...) {
 
                 // if negative number
                 if (ascii < 0) {
+                    //putchar('-');
                     negative = 1; // set negative to 1
                     ascii *= -1; // to turn the rest of the number positive
                 }
@@ -109,83 +111,157 @@ void my_printf(char *phrase, ...) {
                     index++;
                     // get rid of last digit
                     ascii /= 10;
-                }
-                char sign = '0';
-                // get the sign
-                if (negative) {
-                    sign = '-';
-                }
-                else if (plus_flag) {
-                    sign = '+';
+                    length++;
                 }
                 
-                int totalWidth = index;
-
-                // get the number of zeroes needed from precision
-                int addedZeroes = 0;
-
-                // get the total number of chars needed for width after the added precision ones
-                if (index < precision) {
-                    addedZeroes = precision-index;
+                // deal with precision
+                if (precision > 0) {
+                    //int diff = 0;
+                    int totalWidth = length;
                     
-                }
-                totalWidth += addedZeroes;
-                if (sign != '0') {
-                    totalWidth++; // add one more width after the sign
-                }
+                    // if the number of digits is less than the precision number, get the total number of chars needed with the extras added
+                    if (length < precision) {
+                        totalWidth += (precision-length);
+                    }
+                    // trying for left alignment
+                    if (left_alignment == 1){
+                        // since it gets entered backwards, this is where would add the positive or negative to the str
+                        if (negative == 1) {
+                            putchar('-');
+                        }
+                        if (plus_flag == 1 && negative == 0) {
+                         putchar('+');
+                        }     
 
-                int widthSpaces = width - totalWidth;
+                        // now need to place zeroes for precision
+                        for (int i=0; i<(precision-length); i++) {
+                            putchar('0');
+                        }
 
-                // for left padded
-                if (left_alignment == 1) {
-                    //if theres a sign, add it
-                    if (sign != '0') putchar(sign);
-                    //if theres precision, add it
-                    for (int i=0; i<addedZeroes; i++) {
-                        putchar('0');
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                         putchar(str[i]);
+                        }
+                        
+                        // now add the width padding
+                        // over here need to check how many less than width and then put blank spaces
+                        if (totalWidth<width) {
+                            int width_min = width-totalWidth; // how many more spots need to be filled
+                            // this is because the + and - take up a spot
+                            if ((plus_flag == 1 && negative == 0) || negative==1)
+                                width_min--;
+                                // put the blank
+                            for (int i=0; i<width_min; i++)
+                                putchar(' ');
+                        }    
                     }
-                    // add the digits
-                    for (int i = index-1; i >= 0; i--) {
-                        putchar(str[i]);
-                    }
-                    // add the width in spaces
-                    for (int i=0; i<widthSpaces; i++)
-                        putchar(' ');
-                }
-                // for regular
-                else {
-                    // if zeroes is on and totalWidth is greater than width
-                    if (zeroes == 1 && widthSpaces > 0) {
-                        // add the sign
-                        if (sign != '0')
-                            putchar(sign);
-                        // add the rest of the zeroes for width
-                        for (int i=0; i<widthSpaces; i++)
-                            putchar('0');
-                        // add the precision zeroes
-                        for (int i=0; i<addedZeroes; i++)
-                            putchar('0');
-                        // add the digits
-                        for (int i = index-1; i >= 0; i--) 
-                            putchar(str[i]);
-                    }
-                    // if zeroes is off
+                    // if it is deafult alignment
                     else {
-                        // add the blanks for wide
-                        for (int i=0; i<widthSpaces; i++)
-                            putchar(' ');
-                        // add the sign
-                        if (sign != '0')
-                            putchar(sign);
-                        // add the precision zeroes
-                        for (int i=0; i<addedZeroes; i++)
+                        // over here need to check how many less than width and then put blank spaces
+                        if (totalWidth<width) {
+                            int width_min = width-totalWidth; // how many more spots need to be filled
+                            // this is because the + and - take up a spot
+                            if ((plus_flag == 1 && negative == 0) || negative==1)
+                                width_min--;
+                            // put the blank
+                            for (int i=0; i<width_min; i++)
+                                putchar(' ');
+                        }    
+
+                        // since it gets entered backwards, this is where would add the positive or negative to the str
+                        if (negative == 1) {
+                            putchar('-');
+                        }
+                        if (plus_flag == 1 && negative == 0) {
+                            putchar('+');
+                        }     
+
+                        // now need to place zeroes for precision
+                        for (int i=0; i<(precision-length); i++) {
                             putchar('0');
-                        // add the digits
-                        for (int i = index-1; i >= 0; i--) 
-                            putchar(str[i]);
+                        }
+
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                         putchar(str[i]);
+                        }
                     }
                 }
-            }     
+
+                // if precision isn't in the picture
+                else {
+                    
+                    // need to check how many width spots are necessary
+                    // if ((plus_flag == 1 && negative == 0) || negative==1) then need one less spot
+                    if (left_alignment == 0) {
+                        int width_min = width-index;
+                        if ((plus_flag == 1 && negative == 0) || negative==1)
+                            width_min--;
+
+                        // if still needs spaces before putting the plus or minus
+                        if (width_min>0) {
+                            // if it is spaces not zeroes
+                            if (zeroes == 0) {
+                                for  (int i=0; i<width_min;i++)
+                                    putchar(' ');
+                        
+                                if (negative == 1) {
+                                    putchar('-');
+                                }   
+                                if (plus_flag == 1 && negative == 0) {
+                                    putchar('+');
+                                }  
+                            }
+                            // if zeroes instead of spaces
+                            else {
+                                if (negative == 1) {
+                                    putchar('-');
+                                }   
+                                if (plus_flag == 1 && negative == 0) {
+                                    putchar('+');
+                                } 
+
+                                for  (int i=0; i<width_min;i++)
+                                    putchar('0');
+                            }
+                        }
+                        // if don't need more spaces before, just put the sign
+                        else {
+                            if (negative == 1) {
+                                    putchar('-');
+                                }   
+                                if (plus_flag == 1 && negative == 0) {
+                                    putchar('+');
+                                } 
+                        }
+
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                            putchar(str[i]);
+                        }
+                    } 
+                    // left alignment
+                    else {
+                        int width_min = width-index;
+                        if ((plus_flag == 1 && negative == 0) || negative==1)
+                            width_min--;
+
+                        
+                        if (negative == 1) {
+                             putchar('-');
+                        }   
+                        if (plus_flag == 1 && negative == 0) {
+                            putchar('+');
+                        } 
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                            putchar(str[i]);
+                        } 
+                        for  (int i=0; i<width_min;i++)
+                            putchar(' ');
+                    }
+                }
+            }
             // prints it as a char
             // error if more than one character
             // error if not an ascii char
@@ -461,18 +537,18 @@ int main() {
     // printf("Fake printf(): \n");
     // my_printf("Hello World %10c\n", 'f');
 
-    // printf("Normal printf(): \n");
-    // printf("Hello World %10s\n", "face");
+    printf("Normal printf(): \n");
+    printf("Hello World %10s\n", "face");
 
-    // printf("Fake printf(): \n");
-    // my_printf("Hello World %10s\n", "face");
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10s\n", "face");
 
-    // // // width with x
-    // printf("Normal printf(): \n");
-    // printf("%10x\n", 90);
+    // // width with x
+    printf("Normal printf(): \n");
+    printf("%10x\n", 90);
 
-    // printf("fake printf(): \n");
-    // my_printf("%10x\n", 90);
+    printf("fake printf(): \n");
+    my_printf("%10x\n", 90);
 
     // checking with the star*
     printf("Normal printf(): \n");
