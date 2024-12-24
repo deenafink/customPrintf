@@ -121,7 +121,7 @@ void my_printf(char *phrase, ...) {
                 
                 int totalWidth = index;
 
-                // get the number of zeroes needed from precision
+                // get the number of zeroes needed for precision
                 int addedZeroes = 0;
 
                 // get the total number of chars needed for width after the added precision ones
@@ -136,7 +136,7 @@ void my_printf(char *phrase, ...) {
 
                 int widthSpaces = width - totalWidth;
 
-                // for left padded
+                // for left aligned
                 if (left_alignment == 1) {
                     //if theres a sign, add it
                     if (sign != '0') putchar(sign);
@@ -314,58 +314,67 @@ void my_printf(char *phrase, ...) {
                     unsigned_int /= 16;
                 }
 
+                // total number of chars involved
+                int totalWidth = index;
                  // check if # flag is set
                 if (hash_flag == 1) {
                     str[index] = *phrase;
                     index++;
                     str[index] = '0';
-                    index++;         
+                    index++;   
+                    totalWidth += 2;      
                 }
+                int addedZeroes = 0;
+                // get the number of zeroes involved for precision
+                if (index < precision) {
+                   addedZeroes = precision-index;
+                }
+                totalWidth += addedZeroes;
+                // get the number of spaces we need to add for width after precision
+                int widthSpaces = width - totalWidth;
 
-                // deal with precision
-                if (precision > 0) {
-                    int totalWidth = index;
-                    // if the number of digits is less than the precision number, add the difference in zeroes
-                    // add that number to the index
-                    if (index < precision) {
-                        totalWidth += (precision-index);
-                    }
-                
-                
-                    // over here need to check how many less than width and then put blank spaces
-                    if (totalWidth<width) {
-                        int width_min = width-totalWidth;
-                        for (int i=0; i<width_min; i++)
-                            putchar(' ');
-                    }         
-                    // now need to place zeroes for precision
-                    for (int i=0; i<(precision-index); i++) {
+                // for left aligned
+                if (left_alignment == 1) {
+                    // add the precision
+                    for (int i=0; i<(addedZeroes); i++) {
                         putchar('0');
                     }
-
-                    // now need to putchar() the chars - backwards
+                    // add the digits
                     for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
+                        putchar(str[i]);
+                    }
+                    // now add the spaces for width
+                    for (int i = 0; i <widthSpaces; i--) {
                         putchar(str[i]);
                     }
                 }
+                
 
                 // over here need to check how many less than width and then put blank spaces
                 else {
-                    if (index<width) {
-                        int width_min = width-index;
-                        for (int i=0; i<width_min; i++) {
-                            if (zeroes == 0)
-                                putchar(' ');
-                            else
-                                putchar('0');
-                        }
+                    // if zeroes is on and totalWidth is greater than width
+                    if (zeroes == 1 && widthSpaces > 0) {
+                        // add the rest of the zeroes for width
+                        for (int i=0; i<widthSpaces; i++)
+                            putchar('0');
+                        // add the precision zeroes
+                        for (int i=0; i<addedZeroes; i++)
+                            putchar('0');
+                        // add the digits
+                        for (int i = index-1; i >= 0; i--) 
+                            putchar(str[i]);
                     }
-
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
+                    // if zeroes is off
+                    else {
+                        // add the blanks for wide
+                        for (int i=0; i<widthSpaces; i++)
+                            putchar(' ');
+                        // add the precision zeroes
+                        for (int i=0; i<addedZeroes; i++)
+                            putchar('0');
+                        // add the digits
+                        for (int i = index-1; i >= 0; i--) 
+                            putchar(str[i]);
                     }
                 }
             }
@@ -379,102 +388,102 @@ void my_printf(char *phrase, ...) {
 }
 
 int main() {
-    // printf("Normal printf(): ");
-    // printf("Hello World %d\n", 10001);
+    printf("Normal printf(): ");
+    printf("Hello World %d\n", 10001);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %d\n", 10001);
+    printf("Fake printf(): ");
+    my_printf("Hello World %d\n", 10001);
 
-    // printf("Normal printf(): ");
-    // printf("Hello World %d what is your age %d\n", 'f', 3);
+    printf("Normal printf(): ");
+    printf("Hello World %d what is your age %d\n", 'f', 3);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %d what is your age %d\n", 'f', 3);
+    printf("Fake printf(): ");
+    my_printf("Hello World %d what is your age %d\n", 'f', 3);
 
-    // printf("Normal printf(): ");
-    // printf("Hello World %d\n", 0);
+    printf("Normal printf(): ");
+    printf("Hello World %d\n", 0);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %d\n", 0);
+    printf("Fake printf(): ");
+    my_printf("Hello World %d\n", 0);
 
-    // printf("Normal printf(): ");
-    // printf("Hello World %d\n", -55);
+    printf("Normal printf(): ");
+    printf("Hello World %d\n", -55);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %d\n", -55);
+    printf("Fake printf(): ");
+    my_printf("Hello World %d\n", -55);
 
-    // printf("Normal printf(): ");
-    // printf("Hello World %+d\n", 55);
+    printf("Normal printf(): ");
+    printf("Hello World %+d\n", 55);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %+d\n", 55);
+    printf("Fake printf(): ");
+    my_printf("Hello World %+d\n", 55);
 
-    // // c
-    // printf("Normal printf(): ");
-    // printf("Hello World %c\n", 'c');
+    // c
+    printf("Normal printf(): ");
+    printf("Hello World %c\n", 'c');
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %c\n", 'c');
+    printf("Fake printf(): ");
+    my_printf("Hello World %c\n", 'c');
 
-    // // s
-    // printf("Normal printf(): ");
-    // printf("Hello World %s\n", "string");
+    // s
+    printf("Normal printf(): ");
+    printf("Hello World %s\n", "string");
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %s\n", "string");
+    printf("Fake printf(): ");
+    my_printf("Hello World %s\n", "string");
 
-    // // trying all of them together
-    // printf("Normal printf(): ");
-    // printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
+    // trying all of them together
+    printf("Normal printf(): ");
+    printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
 
-    // printf("Fake printf(): ");
-    // my_printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
+    printf("Fake printf(): ");
+    my_printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
 
-    // // x
-    // printf("Normal printf(): ");
-    // printf("Hello World %x\n", 26);
+    // x
+    printf("Normal printf(): ");
+    printf("Hello World %x\n", 26);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %x\n", 26);
+    printf("Fake printf(): ");
+    my_printf("Hello World %x\n", 26);
 
-    // printf("Normal printf(): ");
-    // printf("Hello World %x\n", 689);
+    printf("Normal printf(): ");
+    printf("Hello World %x\n", 689);
 
-    // printf("Fake printf(): ");
-    // my_printf("Hello World %x\n", 689);
+    printf("Fake printf(): ");
+    my_printf("Hello World %x\n", 689);
 
-    // printf("Normal printf(): \n");
-    // printf("Hello World %10d whats up\n", 689);
+    printf("Normal printf(): \n");
+    printf("Hello World %10d whats up\n", 689);
 
-    // printf("Fake printf(): \n");
-    // my_printf("Hello World %10d whats up\n", 689);
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10d whats up\n", 689);
 
-    // printf("Normal printf(): \n");
-    // printf("Hello World %d\n", 689);
+    printf("Normal printf(): \n");
+    printf("Hello World %d\n", 689);
 
-    // printf("Fake printf(): \n");
-    // my_printf("Hello World %d\n", 689);
+    printf("Fake printf(): \n");
+    my_printf("Hello World %d\n", 689);
 
-    // printf("Normal printf(): \n");
-    // printf("Hello World %10c\n", 'f');
+    printf("Normal printf(): \n");
+    printf("Hello World %10c\n", 'f');
 
-    // printf("Fake printf(): \n");
-    // my_printf("Hello World %10c\n", 'f');
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10c\n", 'f');
 
-    // printf("Normal printf(): \n");
-    // printf("Hello World %10s\n", "face");
+    printf("Normal printf(): \n");
+    printf("Hello World %10s\n", "face");
 
-    // printf("Fake printf(): \n");
-    // my_printf("Hello World %10s\n", "face");
+    printf("Fake printf(): \n");
+    my_printf("Hello World %10s\n", "face");
 
-    // // // width with x
-    // printf("Normal printf(): \n");
-    // printf("%10x\n", 90);
+    // // width with x
+    printf("Normal printf(): \n");
+    printf("%10x\n", 90);
 
-    // printf("fake printf(): \n");
-    // my_printf("%10x\n", 90);
+    printf("fake printf(): \n");
+    my_printf("%10x\n", 90);
 
-    // checking with the star*
+    ////checking with the star*
     printf("Normal printf(): \n");
     printf("%*d\n", 10, 10);
 
@@ -629,12 +638,19 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("|%-10c|\n", 'c');
 
-    // left with s
+    //left with s
     printf("Normal printf(): \n");
-    printf("|%-10s|\n", "left");    // Left-align 42 in a field of width 10
+    printf("%-10s\n", "left");    // Left-align 42 in a field of width 10
 
     printf("Fake printf(): \n");
-    my_printf("|%-10s|\n", "left");
+    my_printf("%-10s\n", "left");
+
+    // left with s
+    printf("Normal printf(): \n");
+    printf("%10s\n", "right");    // Left-align 42 in a field of width 10
+
+    printf("Fake printf(): \n");
+    my_printf("%10s\n", "right");
 
     return 0;
 }
