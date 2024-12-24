@@ -24,12 +24,14 @@ void my_printf(char *phrase, ...) {
                 phrase++;
             }
 
-            // int blank_flag = 0;
-            // if (*phrase == ' ') {
-            //     blank_flag = 1;
-            //     phrase++;
-            // }
+            // left alignment flag
+            int left_alignment = 0;
+            if (*phrase == '-') {
+                left_alignment = 1;
+                phrase++;
+            }
 
+            // zero flag
             int zeroes = 0;
             // check if 0 and then do zeros instead of spaces
             if (*phrase == '0') {
@@ -37,6 +39,7 @@ void my_printf(char *phrase, ...) {
                 phrase++;
             }
 
+            // hash flag
             int hash_flag = 0;
             if (*phrase == '#') {
                 hash_flag = 1;
@@ -99,11 +102,6 @@ void my_printf(char *phrase, ...) {
                     negative = 1; // set negative to 1
                     ascii *= -1; // to turn the rest of the number positive
                 }
-                // if positive number and the + flag is there
-                // else {
-                //     if (plus_flag == 1)
-                //         //putchar('+');
-                // }
                 
                 // turn the into a string, but backwards
                 while (ascii > 0) {
@@ -116,118 +114,151 @@ void my_printf(char *phrase, ...) {
                     length++;
                 }
                 
-                // add a teminal char
-                //str[index] = '\0';
-                //index++;
                 // deal with precision
                 if (precision > 0) {
                     //int diff = 0;
                     int totalWidth = length;
-                    // check if blank flag here bc before width and precision
-                    // if (blank_flag == 1) {
-                    //     totalWidth += 1;
-                    // }
-
-                    // if ((plus_flag == 1 && negative == 0) || negative==1)
-                    // length++;
-
                     
-                    // if the number of digits is less than the precision number, add the difference in zeroes
-                    // add that number to the index
+                    // if the number of digits is less than the precision number, get the total number of chars needed with the extras added
                     if (length < precision) {
                         totalWidth += (precision-length);
                     }
+                    // trying for left alignment
+                    if (left_alignment == 1){
+                        // since it gets entered backwards, this is where would add the positive or negative to the str
+                        if (negative == 1) {
+                            putchar('-');
+                        }
+                        if (plus_flag == 1 && negative == 0) {
+                         putchar('+');
+                        }     
 
+                        // now need to place zeroes for precision
+                        for (int i=0; i<(precision-length); i++) {
+                            putchar('0');
+                        }
 
-                    // over here need to check how many less than width and then put blank spaces
-                    if (totalWidth<width) {
-                        int width_min = width-totalWidth;
-                        // this is because the + and - take up a spot
-                        if ((plus_flag == 1 && negative == 0) || negative==1)
-                            width_min--;
-
-                        for (int i=0; i<width_min; i++)
-                            putchar(' ');
-                    }    
-
-                    // since it gets entered backwards, this is where would add the positive or negative to the str
-                    if (negative == 1) {
-                        putchar('-');
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                         putchar(str[i]);
+                        }
+                        
+                        // now add the width padding
+                        // over here need to check how many less than width and then put blank spaces
+                        if (totalWidth<width) {
+                            int width_min = width-totalWidth; // how many more spots need to be filled
+                            // this is because the + and - take up a spot
+                            if ((plus_flag == 1 && negative == 0) || negative==1)
+                                width_min--;
+                                // put the blank
+                            for (int i=0; i<width_min; i++)
+                                putchar(' ');
+                        }    
                     }
-                    if (plus_flag == 1 && negative == 0) {
-                        putchar('+');
-                    }     
+                    // if it is deafult alignment
+                    else {
+                        // over here need to check how many less than width and then put blank spaces
+                        if (totalWidth<width) {
+                            int width_min = width-totalWidth; // how many more spots need to be filled
+                            // this is because the + and - take up a spot
+                            if ((plus_flag == 1 && negative == 0) || negative==1)
+                                width_min--;
+                            // put the blank
+                            for (int i=0; i<width_min; i++)
+                                putchar(' ');
+                        }    
 
-                    
-                    // now need to place zeroes for precision
-                    for (int i=0; i<(precision-length); i++) {
-                        putchar('0');
-                    }
+                        // since it gets entered backwards, this is where would add the positive or negative to the str
+                        if (negative == 1) {
+                            putchar('-');
+                        }
+                        if (plus_flag == 1 && negative == 0) {
+                            putchar('+');
+                        }     
 
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
+                        // now need to place zeroes for precision
+                        for (int i=0; i<(precision-length); i++) {
+                            putchar('0');
+                        }
+
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                         putchar(str[i]);
+                        }
                     }
                 }
 
-                // over here need to check how many less than width and then put blank spaces
+                // if precision isn't in the picture
                 else {
+                    
                     // need to check how many width spots are necessary
                     // if ((plus_flag == 1 && negative == 0) || negative==1) then need one less spot
-                    int width_min = width-index;
-                    
-                    if ((plus_flag == 1 && negative == 0) || negative==1)
+                    if (left_alignment == 0) {
+                        int width_min = width-index;
+                        if ((plus_flag == 1 && negative == 0) || negative==1)
                             width_min--;
 
-                    if (width_min>0) {
-                        if (zeroes == 0) {
-                            for  (int i=0; i<width_min;i++)
-                                putchar(' ');
+                        // if still needs spaces before putting the plus or minus
+                        if (width_min>0) {
+                            // if it is spaces not zeroes
+                            if (zeroes == 0) {
+                                for  (int i=0; i<width_min;i++)
+                                    putchar(' ');
                         
-                            if (negative == 1) {
-                                putchar('-');
-                            }   
-                            if (plus_flag == 1 && negative == 0) {
-                                putchar('+');
-                            }  
+                                if (negative == 1) {
+                                    putchar('-');
+                                }   
+                                if (plus_flag == 1 && negative == 0) {
+                                    putchar('+');
+                                }  
+                            }
+                            // if zeroes instead of spaces
+                            else {
+                                if (negative == 1) {
+                                    putchar('-');
+                                }   
+                                if (plus_flag == 1 && negative == 0) {
+                                    putchar('+');
+                                } 
+
+                                for  (int i=0; i<width_min;i++)
+                                    putchar('0');
+                            }
                         }
+                        // if don't need more spaces before, just put the sign
                         else {
                             if (negative == 1) {
-                                putchar('-');
-                            }   
-                            if (plus_flag == 1 && negative == 0) {
-                                putchar('+');
-                            } 
-
-                            for  (int i=0; i<width_min;i++)
-                                putchar('0');
+                                    putchar('-');
+                                }   
+                                if (plus_flag == 1 && negative == 0) {
+                                    putchar('+');
+                                } 
                         }
-                    }
+
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                            putchar(str[i]);
+                        }
+                    } 
+                    // left alignment
                     else {
+                        int width_min = width-index;
+                        if ((plus_flag == 1 && negative == 0) || negative==1)
+                            width_min--;
+
+                        
                         if (negative == 1) {
-                                putchar('-');
-                            }   
-                            if (plus_flag == 1 && negative == 0) {
-                                putchar('+');
-                            } 
-                    }
-
-                    // if (index<width) {
-                    //     int width_min = width-index;
-                    //     for (int i=0; i<width_min; i++) {
-                    //         if (zeroes == 0)
-                    //             putchar(' ');
-                    //         else
-                    //             putchar('0');
-                    //     }
-                    // }
-
-
-                    // now need to putchar() the chars - backwards
-                    for (int i = index-1; i >= 0; i--) {
-                        //printf("here");
-                        putchar(str[i]);
+                             putchar('-');
+                        }   
+                        if (plus_flag == 1 && negative == 0) {
+                            putchar('+');
+                        } 
+                        // now need to putchar() the chars - backwards
+                        for (int i = index-1; i >= 0; i--) {
+                            putchar(str[i]);
+                        } 
+                        for  (int i=0; i<width_min;i++)
+                            putchar(' ');
                     }
                 }
             }
@@ -236,10 +267,19 @@ void my_printf(char *phrase, ...) {
             // error if not an ascii char
             if (*phrase == 'c') {
                 char character = va_arg(ap, int); // get the next argument, the parameter is an int idk why can ask that
-                // deal with width here
-                for (int i=0; i<width-1; i++)
-                    putchar(' ');
-                putchar(character);
+                // check if left alignment
+                if (left_alignment == 1) {
+                    putchar(character);
+                    // deal with width here
+                    for (int i=0; i<width-1; i++)
+                        putchar(' ');
+                }
+                else {
+                    // deal with width here
+                    for (int i=0; i<width-1; i++)
+                        putchar(' ');
+                    putchar(character);
+                }
             }
             // s should be the same thing just multiple character so will move through it and print one by one
             if (*phrase == 's') {
@@ -255,35 +295,69 @@ void my_printf(char *phrase, ...) {
                 //restore the pointer to the original point in memory
                 string = copy;
 
+                // if normal alignment
                 // deal with precision
-                if (precision > 0) {
-                    // width and precision together
-                    if (width > precision) {
-                        int diff = width-precision;
-                        for (int i=0; i<diff; i++)
-                            putchar(' ');
-                    }
+                if (left_alignment == 0) {
+                    if (precision > 0) {
+                        // width and precision together
+                        if (width > precision) {
+                            int diff = width-precision;
+                            for (int i=0; i<diff; i++)
+                                putchar(' ');
+                        }
                     
-                    int num = 0; // this is for precision
-                    while (*string != '\0' && num < precision) {
-                        putchar(*string);
-                        string++;
-                        num++;
+                        int num = 0; // this is for precision
+                        while (*string != '\0' && num < precision) {
+                            putchar(*string);
+                            string++;
+                            num++;
+                        }
+                    }
+
+                    // insert the spaces for width (without precision specified)
+                    // update: check if width is greater than precision, not len
+                    else {
+                        if (width > len) {
+                            int diff = width-len;
+                            for (int i=0; i<diff; i++)
+                                putchar(' ');
+                        }
+                        // add the letters now
+                        while (*string != '\0') {
+                            putchar(*string);
+                            string++;
+                        }
                     }
                 }
-
-                // insert the spaces for width (without precision specified)
-                // update: check if width is greater than precision, not len
                 else {
-                    if (width > len) {
-                        int diff = width-len;
-                        for (int i=0; i<diff; i++)
-                            putchar(' ');
+                    if (precision > 0) {
+                        int num = 0; // this is for precision
+                        while (*string != '\0' && num < precision) {
+                            putchar(*string);
+                            string++;
+                            num++;
+                        }
+                        // width and precision together
+                        if (width > precision) {
+                            int diff = width-precision;
+                            for (int i=0; i<diff; i++)
+                                putchar(' ');
+                        }
                     }
-                    // add the letters now
-                    while (*string != '\0') {
-                        putchar(*string);
-                        string++;
+
+                    // insert the spaces for width (without precision specified)
+                    // update: check if width is greater than precision, not len
+                    else {
+                        // add the letters now
+                        while (*string != '\0') {
+                            putchar(*string);
+                            string++;
+                        }
+                        if (width > len) {
+                            int diff = width-len;
+                            for (int i=0; i<diff; i++)
+                                putchar(' ');
+                        }
                     }
                 }
             } 
@@ -608,15 +682,54 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("%+04.5d\n", 6);
 
-    // plus without zeroes
+    // plus with zeroes
     printf("Normal printf(): \n");
-    printf("%+04d\n", 6);
+    printf("%+4d\n", 6);
 
     printf("Fake printf(): \n");
-    my_printf("%+04d\n", 6);
+    my_printf("%+4d\n", 6);
 
-    // plus with zeroes
+    // plus without zeroes
+    printf("Normal printf(): \n");
+    printf("%+4d\n", 6);
 
+    printf("Fake printf(): \n");
+    my_printf("%+4d\n", 6);
+    
+    // plus sign but negative
+    printf("Normal printf(): \n");
+    printf("%+4d\n", -6);
+
+    printf("Fake printf(): \n");
+    my_printf("%+4d\n", -6);
+
+    // left comparison with precision involved
+    printf("Normal printf(): \n");
+    printf("|%-10.3d|\n", 42);    // Left-align 42 in a field of width 10
+
+    printf("Fake printf(): \n");
+    my_printf("|%-10.3d|\n", 42);
+
+    // left comparison without precision involved
+    printf("Normal printf(): \n");
+    printf("|%-10d|\n", 42);    // Left-align 42 in a field of width 10
+
+    printf("Fake printf(): \n");
+    my_printf("|%-10d|\n", 42);
+
+    // left with c
+    printf("Normal printf(): \n");
+    printf("|%-10c|\n", 'c');    // Left-align 42 in a field of width 10
+
+    printf("Fake printf(): \n");
+    my_printf("|%-10c|\n", 'c');
+
+    // left with s
+    printf("Normal printf(): \n");
+    printf("|%-10s|\n", "left");    // Left-align 42 in a field of width 10
+
+    printf("Fake printf(): \n");
+    my_printf("|%-10s|\n", "left");
 
     return 0;
 }
