@@ -1,10 +1,6 @@
 #include <stdio.h>
 //#include <string.h>
 #include <stdarg.h>
-// plan is to use putc() or putchar() to take a char at a time and put them into a list which will ultimately be printed
-// loop through the first parameter and get each char into an array
-// put them to stdout
-// maybe use ascii to help with identifiers?
 
 
 // next step: if encounter % then go to a section that asks if is %d, %x, %c, or %s and do different things based on that
@@ -21,6 +17,7 @@ char get_sign(int negative, int plus_flag) {
     return sign;
 }
 
+// function to store numbers in a list to later print one by one
 void store_numbers(int num, int *index, char * str) {
     if (num == 0)
         str[(*index)++] = '0';
@@ -37,35 +34,18 @@ void store_numbers(int num, int *index, char * str) {
 }
 
 void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
-    int ascii = num;
     int negative = 0;
     // sizes can only be 10 places anyway
     char str[12]; // later want to turn the int into a str to print each digit individually
     int index = 0;
 
-    // edge case of 0
-    // if (ascii == 0) {
-    //     str[index] = '0';
-    //     index++;
-    // }
-
     // if negative number
-    if (ascii < 0) {
+    if (num < 0) {
         negative = 1; // set negative to 1
-        ascii *= -1; // to turn the rest of the number positive
+        num *= -1; // to turn the rest of the number positive
     }
     
-    // turn the into a string, but backwards
-    // can be a function here
-    // while (ascii > 0) {
-    //     int temp = ascii % 10;
-    //     // add this digit to the string
-    //     str[index] = '0' + temp;
-    //     index++;
-    //     // get rid of last digit
-    //     ascii /= 10;
-    // }
-    store_numbers(ascii, &index, str);
+    store_numbers(num, &index, str);
     char sign = get_sign(negative, plus_flag);
     
     int totalWidth = index;
@@ -246,6 +226,7 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
     // have a list of the hex digits
     char hex[16] = "0123456789abcdef";
     // turn the into a string, but backwards
+    // not using the function because of the hex conversion
     while (num > 0) {
         int temp = num % 16;
         // add this digit to the string
@@ -319,7 +300,7 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
         }
     }
 }
-
+// custom %m type which treats the argument as a math expression
 void print_m(char *string, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
     //printf("%d\n", 2+3)
     // while it's a number, get the number
@@ -469,311 +450,3 @@ void my_printf(char *phrase, ...) {
     }
     va_end(ap); // cleanup the va_list
 }
-
-// int main() {
-//     printf("Normal printf(): ");
-//     printf("Hello World %d\n", 10001);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %d\n", 10001);
-
-//     printf("Normal printf(): ");
-//     printf("Hello World %d what is your age %d\n", 'f', 3);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %d what is your age %d\n", 'f', 3);
-
-//     printf("Normal printf(): ");
-//     printf("Hello World %d\n", 0);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %d\n", 0);
-
-//     printf("Normal printf(): ");
-//     printf("Hello World %d\n", -55);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %d\n", -55);
-
-//     printf("Normal printf(): ");
-//     printf("Hello World %+d\n", 55);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %+d\n", 55);
-
-//     // c
-//     printf("Normal printf(): ");
-//     printf("Hello World %c\n", 'c');
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %c\n", 'c');
-
-//     // s
-//     printf("Normal printf(): ");
-//     printf("Hello World %s\n", "string");
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %s\n", "string");
-
-//     // trying all of them together
-//     printf("Normal printf(): ");
-//     printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
-
-//     printf("Fake printf(): ");
-//     my_printf("This is a: %s, This is a number: %d, This is a char: %c\n", "string", 4, 'c');
-
-//     // x
-//     printf("Normal printf(): ");
-//     printf("Hello World %x\n", 26);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %x\n", 26);
-
-//     printf("Normal printf(): ");
-//     printf("Hello World %x\n", 689);
-
-//     printf("Fake printf(): ");
-//     my_printf("Hello World %x\n", 689);
-
-//     printf("Normal printf(): \n");
-//     printf("Hello World %10d whats up\n", 689);
-
-//     printf("Fake printf(): \n");
-//     my_printf("Hello World %10d whats up\n", 689);
-
-//     printf("Normal printf(): \n");
-//     printf("Hello World %d\n", 689);
-
-//     printf("Fake printf(): \n");
-//     my_printf("Hello World %d\n", 689);
-
-//     printf("Normal printf(): \n");
-//     printf("Hello World %10c\n", 'f');
-
-//     printf("Fake printf(): \n");
-//     my_printf("Hello World %10c\n", 'f');
-
-//     printf("Normal printf(): \n");
-//     printf("Hello World %10s\n", "face");
-
-//     printf("Fake printf(): \n");
-//     my_printf("Hello World %10s\n", "face");
-
-//     // // width with x
-//     printf("Normal printf(): \n");
-//     printf("%10x\n", 90);
-
-//     printf("fake printf(): \n");
-//     my_printf("%10x\n", 90);
-
-//     ////checking with the star*
-//     printf("Normal printf(): \n");
-//     printf("%*d\n", 10, 10);
-
-//     printf("fake printf(): \n");
-//     my_printf("%*d\n", 10, 10);
-
-//     //width and precision
-//     printf("Normal printf(): \n");
-//     printf("Hello World %10.3s\n", "face");
-
-//     printf("Fake printf(): \n");
-//     my_printf("Hello World %10.3s\n", "face");
-
-//     // precision
-//     printf("Normal printf(): \n");
-//     printf("%.*s\n", 3, "abcdef");
-
-//     printf("Fake printf(): \n");
-//     my_printf("%.*s\n", 3, "abcdef");
-
-//     // width with zero flag
-//     printf("Normal printf(): \n");
-//     printf("%04d\n", 7);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%04d\n", 7);
-
-//     printf("width with zero flag\n");
-
-//     printf("Normal printf(): \n");
-//     printf("%04x\n", 70);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%04x\n", 70);
-
-//     // check precision for d
-//     printf("Normal printf(): \n");
-//     printf("%.5d\n", 70);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%.5d\n", 70);
-
-//     // check precision for d with width also
-//     printf("Normal printf(): \n");
-//     printf("%7.5d\n", 70);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%7.5d\n", 70);
-
-//     // trying precision with x
-//     printf("Normal printf(): \n");
-//     printf("%5.3x\n", 70);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%5.3x\n", 70);
-
-
-//     // more flags
-//     printf("Normal printf(): \n");
-//     printf("%04X\n",3);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%04X\n",3);
-
-//     // deal with flags with width
-//     printf("Normal printf(): \n");
-//     printf("%+2d\n", 555);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%+2d\n", 555);
-
-//     printf("Normal printf(): \n");
-//     printf("%6d\n", -400);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%6d\n", -400);
-
-//     // testing with the hash flag
-//     printf("test\n");
-
-//     printf("Normal printf(): \n");
-//     printf("%#5.2x\n", 400);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%#5.2x\n", 400);
-
-//     printf("Normal printf(): \n");
-//     printf("%#5.2X\n", 400);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%#5.2X\n", 400);
-
-//     printf("Normal printf(): \n");
-//     printf("%5.2d\n", 40);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%5.2d\n", 40);
-    
-//     // negative with hex
-//     printf("Normal printf(): \n");
-//     printf("%5.2x\n", -40);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%5.2x\n", -40);
-
-//     // plus flag with width bigger than precision
-//     printf("Normal printf(): \n");
-//     printf("%6c   hi %+4.2d\n", 'c', 6);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%6c   hi %+4.2d\n", 'c', 6);
-
-//     // plus with zeroes
-//     printf("Normal printf(): \n");
-//     printf("%+4d\n", 6);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%+4d\n", 6);
-
-//     // plus without zeroes
-//     printf("Normal printf(): \n");
-//     printf("%+4d\n", 6);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%+4d\n", 6);
-    
-//     // plus sign but negative
-//     printf("Normal printf(): \n");
-//     printf("%+4d\n", -6);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%+4d\n", -6);
-
-//     // left comparison with precision involved
-//     printf("Normal printf(): \n");
-//     printf("|%-10.3d|\n", 42);    
-
-//     printf("Fake printf(): \n");
-//     my_printf("|%-10.3d|\n", 42);
-
-//     // left comparison without precision involved
-//     printf("Normal printf(): \n");
-//     printf("|%-10d|\n", 42);    
-
-//     printf("Fake printf(): \n");
-//     my_printf("|%-10d|\n", 42);
-
-//     // left with c
-//     printf("Normal printf(): \n");
-//     printf("|%-10c|\n", 'c');    
-
-//     printf("Fake printf(): \n");
-//     my_printf("|%-10c|\n", 'c');
-
-//     //left with s
-//     printf("Normal printf(): \n");
-//     printf("%-10s\n", "left");    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%-10s\n", "left");
-
-//     // left with s
-//     printf("Normal printf(): \n");
-//     printf("%10s\n", "right");    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%10s\n", "right");
-
-//     printf("Normal printf(): \n");
-//     printf("%d\n", 5);    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%d\n", 5);
-
-//     printf("Normal printf(): \n");
-//     printf("%c\n", 'c');    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%c\n", 'c');
-
-//     printf("Normal printf(): \n");
-//     printf("%d\n", 5);    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%d\n", 5);
-
-//     printf("Normal printf(): \n");
-//     printf("%s\n", "choja");    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%s\n", "choja");
-
-//     printf("Normal printf(): \n");
-//     printf("%x\n", 2454);    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%x\n", 2454);
-
-//     printf("Fake printf(): \n");
-//     my_printf("%m\n", "5+2");
-
-//     printf("Fake printf(): \n");
-//     my_printf("%m\n", "5-2");
-
-//     printf("Fake printf(): \n");
-//     my_printf("%m\n", "5*2");
-
-
-//     return 0;
-// }
