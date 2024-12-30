@@ -1,5 +1,4 @@
 #include <stdio.h>
-//#include <string.h>
 #include <stdarg.h>
 
 
@@ -346,6 +345,62 @@ void print_m(char *string, int plus_flag, int left_alignment, int zeroes, int wi
     // now need to print out the numbers one by one
 }
 
+void print_b(int num, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
+    // max is 32 bit
+    char str[32];
+    int index = 0;
+    
+    // get the positive of the number
+    int pos;
+    if (num > 0) {
+        pos = num;
+    }
+    else if (num < 0) {
+        pos = -num;
+    }
+    
+    // get the number in binary stored backwards in an array
+    while (pos > 0) {
+        int temp = pos % 2;
+        // add this digit to the string
+        str[index] = '0' + temp;
+        index++;
+        // get rid of last digit
+        pos /= 2;
+    }
+    // fill the rest with 0s
+    for (int i=index; i<32; i++) {
+        str[index] = '0';
+        index++;
+    }
+
+    // if num is negative, need twos complement
+    if (num < 0) {
+        // flip the bits
+        for (int i=0; i<32; i++) {
+            // 1 if 0, 0 if 1
+            str[i] = (str[i] == '0') ? '1':'0';
+        }
+        // add one with carry on
+        int carryOver = 1;
+        // starting at end bc its put in str backwards
+        for (int i = 31; i >= 0; i--) {
+            // if there is a 0 there, add 1
+            if (str[i] == '0' && carryOver == '1') {
+                str[i] = '1';
+                break;
+            }
+            // if theres a one there, carry it over
+            if (str[i] == '1' && carryOver == '1'){
+                str[i] = '0';
+            }
+        }
+    }
+    // put the chars one by one backwards
+    for (int i = 31; i >= 0; i--) 
+        putchar(str[i]);
+}
+
 void my_printf(char *phrase, ...) {
     va_list ap; // initialize list for variables
     va_start(ap, phrase);
@@ -431,9 +486,7 @@ void my_printf(char *phrase, ...) {
                 print_s(string, plus_flag, left_alignment, zeroes, width, precision);
             } 
                 
-            // if x: unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case. could be similar to d
-            // use 16 instead of 10
-            // right now not working fully
+            // if x: unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case.
             if (*phrase == 'x' || *phrase == 'X') {
                 unsigned int num = va_arg(ap, int); // get the next argument, the parameter is an int idk why can ask that
                 print_x(num, plus_flag, left_alignment, zeroes, width, precision, hash_flag, *phrase);
@@ -442,6 +495,10 @@ void my_printf(char *phrase, ...) {
                 char *string = va_arg(ap, char*); // get the next argument
                 print_m(string, plus_flag, left_alignment, zeroes, width, precision);
             } 
+            if (*phrase == 'b') {
+                int num = va_arg(ap, int); // get the next argument
+                print_b(num, plus_flag, left_alignment, zeroes, width, precision);
+            }
         }
         else {
             putchar(*phrase);
@@ -450,3 +507,12 @@ void my_printf(char *phrase, ...) {
     }
     va_end(ap); // cleanup the va_list
 }
+// int main() {
+//     my_printf("%b\n", 5);
+//     my_printf("%b\n", -5);
+
+//     my_printf("%b\n", 504);
+//     my_printf("%b\n", -504);
+
+//     return 0;
+// }

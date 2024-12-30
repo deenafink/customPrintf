@@ -340,5 +340,12 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("%m\n", "5*2");
 
+    // custom %b testing
+    my_printf("%b\n", 5);
+    my_printf("%b\n", -5);
+
+    my_printf("%b\n", 504);
+    my_printf("%b\n", -504);
+
     return 0;
 }
