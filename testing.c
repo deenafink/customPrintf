@@ -76,7 +76,7 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("%2.6d\n", 84);
 
-    // plus flag with negatvie number
+    // plus flag with negative number
     printf("plus flag with negative number (don't print it)\n");
     printf("Normal printf(): \n");
     printf("%+d\n", -555);
@@ -116,7 +116,7 @@ int main() {
     printf("Fake printf(): \n");
     my_printf("%+4d\n", -6);
 
-    // left alignemnt flag with precision involved
+    // left alignment flag with precision involved
     printf("left alignment, precision too:\n");
     printf("Normal printf(): \n");
     printf("|%-10.3d|\n", 42);    
@@ -155,6 +155,44 @@ int main() {
 
     printf("fake printf(): \n");
     my_printf("%*d\n", 10, 10);
+
+    // checking the space flag
+    printf("space flag:\n");
+    printf("Normal printf(): \n");
+    printf("% d\n", 787);
+
+    printf("fake printf(): \n");
+    my_printf("% d\n", 787);
+
+     // width
+    printf("Normal printf(): \n");
+    printf("|% 5d|\n", 7);
+
+    printf("fake printf(): \n");
+    my_printf("|% 5d|\n", 7);
+    
+    // with precision
+    printf("Normal printf(): \n");
+    printf("|% 3.7d|\n", 80);
+
+    printf("fake printf(): \n");
+    my_printf("|% 3.7d|\n", 80);
+
+    // space with zero flag and width
+    printf("space with zero flag and width");
+    printf("Normal printf(): \n");
+    printf("|%0 7d|\n", 56);
+
+    printf("fake printf(): \n");
+    my_printf("|%0 7d|\n", 56);
+
+    // space with left alignment
+    printf("space with left alignment");
+    printf("Normal printf(): \n");
+    printf("|%-4d|\n", 200);
+
+    printf("fake printf(): \n");
+    my_printf("|%-4d|\n", 200);
 
     // %c testing
     printf("\n");

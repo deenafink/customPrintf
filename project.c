@@ -32,7 +32,7 @@ void store_numbers(int num, int *index, char * str) {
     str[*index] = '\0'; 
 }
 
-void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
+void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, int precision, int space_flag) {
     int negative = 0;
     // sizes can only be 10 places anyway
     char str[12]; // later want to turn the int into a str to print each digit individually
@@ -62,12 +62,19 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
         totalWidth++; // add one more width after the sign
     }
 
+    //if blank space flag is on and sign == '0', make width spaces one less for this one
+    if (space_flag == 1 && sign == '0')
+        totalWidth++;
+
     int widthSpaces = width - totalWidth;
 
     // for left aligned: order is sign, precision, digits, width
     if (left_alignment == 1) {
         //if theres a sign, add it
         if (sign != '0') putchar(sign);
+        // if blank space flag is on and sign == '0', put a space
+        if (space_flag == 1 && sign == '0')
+            putchar(' ');
         //if theres precision, add it
         for (int i=0; i<addedZeroes; i++) {
             putchar('0');
@@ -84,10 +91,13 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
     else {
         // if zeroes is on and totalWidth is greater than width
         // order is sign, width zeroes, precision, digits
-        if (zeroes == 1 && widthSpaces > 0) {
+        if (zeroes == 1) {
             // add the sign
             if (sign != '0')
                 putchar(sign);
+            // if blank space flag is on and sign == '0', put a space
+            if (space_flag == 1 && sign == '0')
+                putchar(' ');
             // add the rest of the zeroes for width
             for (int i=0; i<widthSpaces; i++)
                 putchar('0');
@@ -107,6 +117,9 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
             // add the sign
             if (sign != '0')
                 putchar(sign);
+            // if blank space flag is on and sign == '0', put a space
+            if (space_flag == 1 && sign == '0')
+                putchar(' ');
             // add the precision zeroes
             for (int i=0; i<addedZeroes; i++)
                 putchar('0');
@@ -401,6 +414,7 @@ void print_b(int num, int plus_flag, int left_alignment, int zeroes, int width, 
     for (int i = 31; i >= 0; i--) 
         putchar(str[i]);
 }
+// added a length type, which returns the length of the string becuase c doesn't have a built in function to do that like python's len() wihtout importing a library
 void print_l(char *string) {
     char str[12]; // later want to turn the int into a str to print each digit individually
     int index = 0;
@@ -451,6 +465,13 @@ void my_printf(char *phrase, ...) {
                 phrase++;
             }
 
+            // space flag
+            int space_flag = 0;
+            if (*phrase == ' ') {
+                space_flag = 1;
+                phrase++;
+            }
+
             // width field the number is the minimum number of chars in output
             // get the number to be used later
             int width = 0;
@@ -487,7 +508,7 @@ void my_printf(char *phrase, ...) {
 
             if (*phrase == 'd') {
                 int num = va_arg(ap, int); // get the next argument
-                print_d(num, plus_flag, left_alignment, zeroes, width, precision);
+                print_d(num, plus_flag, left_alignment, zeroes, width, precision, space_flag);
             }     
             // prints it as a char
             if (*phrase == 'c') {
@@ -526,13 +547,6 @@ void my_printf(char *phrase, ...) {
     va_end(ap); // cleanup the va_list
 }
 // int main() {
-//     my_printf("%b\n", 5);
-//     my_printf("%b\n", -5);
-
-//     my_printf("%b\n", 504);
-//     my_printf("%b\n", -504);
-
-//     my_printf("%b\n", 0);
 
 //     return 0;
 // }
