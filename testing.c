@@ -341,11 +341,22 @@ int main() {
     my_printf("%m\n", "5*2");
 
     // custom %b testing
-    my_printf("%b\n", 5);
-    my_printf("%b\n", -5);
+    printf("\n");
+    my_printf("%b (5 in binary)\n", 5);
+    my_printf("%b (-5 in binary- two's complement) \n", -5);
 
-    my_printf("%b\n", 504);
-    my_printf("%b\n", -504);
+    my_printf("%b (504 in binary)\n", 504);
+    my_printf("%b (-504 in binary- two's complement)\n", -504);
 
+    my_printf("%b (0 in binary)\n", 0);
+
+    // custom %l testing
+    printf("\n");
+    printf("length of hello\n");
+    my_printf("%l\n", "hello");
+    my_printf("The length of %s is: %l\n", "hello", "hello");
+    my_printf("The length of %s is: %l\n", "hi bye", "hi bye");
+    // empty string
+    my_printf("length of empty string: %l", "");
     return 0;
 }

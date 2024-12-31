@@ -141,7 +141,8 @@ void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int wi
         len++;
         string++;
     }
-    //restore the pointer to the original point in memory
+
+    //restore the pointer back to the first char
     string = copy;
 
     // if normal alignment
@@ -370,8 +371,7 @@ void print_b(int num, int plus_flag, int left_alignment, int zeroes, int width, 
     }
     // fill the rest with 0s
     for (int i=index; i<32; i++) {
-        str[index] = '0';
-        index++;
+        str[i] = '0';
     }
 
     // if num is negative, need twos complement
@@ -383,21 +383,35 @@ void print_b(int num, int plus_flag, int left_alignment, int zeroes, int width, 
         }
         // add one with carry on
         int carryOver = 1;
-        // starting at end bc its put in str backwards
-        for (int i = 31; i >= 0; i--) {
+        // adding one to either end works, tried both
+        for (int i = 0; i <= 31; i++) {
             // if there is a 0 there, add 1
-            if (str[i] == '0' && carryOver == '1') {
+            if (str[i] == '0' && carryOver == 1) {
                 str[i] = '1';
-                break;
+                carryOver = 0;
+                break; // rest of array remains the same
             }
             // if theres a one there, carry it over
-            if (str[i] == '1' && carryOver == '1'){
+            if (str[i] == '1' && carryOver == 1){
                 str[i] = '0';
             }
         }
     }
     // put the chars one by one backwards
     for (int i = 31; i >= 0; i--) 
+        putchar(str[i]);
+}
+void print_l(char *string) {
+    char str[12]; // later want to turn the int into a str to print each digit individually
+    int index = 0;
+    int len = 0;
+    while (*string != '\0') {
+        len++;
+        string++;
+    }
+    store_numbers(len, &index, str);
+    // now print it backwards
+    for (int i = index-1; i >= 0; i--)
         putchar(str[i]);
 }
 
@@ -499,6 +513,10 @@ void my_printf(char *phrase, ...) {
                 int num = va_arg(ap, int); // get the next argument
                 print_b(num, plus_flag, left_alignment, zeroes, width, precision);
             }
+            if (*phrase == 'l') {
+                char *string = va_arg(ap, char*); // get the next argument
+                print_l(string);
+            } 
         }
         else {
             putchar(*phrase);
@@ -513,6 +531,8 @@ void my_printf(char *phrase, ...) {
 
 //     my_printf("%b\n", 504);
 //     my_printf("%b\n", -504);
+
+//     my_printf("%b\n", 0);
 
 //     return 0;
 // }
