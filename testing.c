@@ -441,6 +441,16 @@ int main() {
     my_printf("%m\n", "5*2");
 
     printf("\n");
+    printf("200/2=100\n");
+    my_printf("%m\n", "200/2");
+    printf("5/2=2 (int division)\n");
+    my_printf("%m\n", "5/2");
+    printf("0/8=0\n");
+    my_printf("%m\n", "0/8");
+    printf("9/0=error\n");
+    my_printf("%m\n", "9/0");
+
+    printf("\n");
     // custom %b testing
     printf("\n");
     my_printf("%b (5 in binary)\n", 5);

@@ -14,6 +14,14 @@ char get_sign(int negative, int plus_flag) {
     }
     return sign;
 }
+// function to handle division by 0
+void handle_error() {
+    char *message = "Error: Division by zero";
+    while (*message) {
+        putchar(*message);
+        message++;
+    }
+}
 
 // function to store numbers in a list to later print one by one
 void store_numbers(int num, int *index, char * str) {
@@ -259,6 +267,7 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeros, int
 
     // check if # flag is set
     if (hash_flag == 1) {
+        // format is going to be either X or x
         str[index] = format;
         index++;
         str[index] = '0';
@@ -323,11 +332,12 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeros, int
 }
 // custom %m type which treats the argument as a math expression
 // sample format: printf("%d\n", 2+3)
-void print_m(char *string, int plus_flag, int left_alignment, int zeros, int width, int precision) {
+// does int division
+void print_m(char *string) {
 
     int num1 = 0;
     int num2 = 0;
-    char addOrMinus = '\0';
+    char operator = '\0';
     char str[12];
 
     // while it's a number, get it and it and add it to num1
@@ -337,11 +347,13 @@ void print_m(char *string, int plus_flag, int left_alignment, int zeros, int wid
     }
     // get the sign
     if (*string == '+')
-        addOrMinus = '+';
+        operator = '+';
     else if (*string == '-')
-        addOrMinus = '-';
+        operator = '-';
     else if (*string == '*')
-        addOrMinus = '*';
+        operator = '*';
+    else if (*string == '/')
+        operator = '/';
     string++;
 
     // while it's a number, get it and it and add it to num2
@@ -350,14 +362,23 @@ void print_m(char *string, int plus_flag, int left_alignment, int zeros, int wid
         num2 = (num2 * 10) + *string - '0';
         string++;
     }
+
+    // division by 0;
+    if (num2 == 0) {
+        handle_error();
+        return;
+    }
+
     int ret = 0; 
     // do the math with right operation and store the answer in ret
-    if (addOrMinus == '+')
+    if (operator == '+')
         ret = num1+num2;
-    else if (addOrMinus == '-')
+    else if (operator == '-')
         ret = num1-num2;
-    else if (addOrMinus == '*')
+    else if (operator == '*')
         ret = num1 * num2;
+    else if (operator == '/')
+        ret = num1 / num2;
     
     int index = 0;
     // store numbers in a str array
@@ -366,17 +387,16 @@ void print_m(char *string, int plus_flag, int left_alignment, int zeros, int wid
     // now need to print out the numbers one by one in reverse stored order
     for (int i = index-1; i >= 0; i--) 
         putchar(str[i]);
-    
 }
 // custom %b which converts the int into a binary number, including 2's complement
-void print_b(int num, int plus_flag, int left_alignment, int zeros, int width, int precision) {
+void print_b(int num) {
     // max is 32 bit
     char str[32];
     int index = 0;
     
     // get the positive of the number
     int pos;
-    if (num > 0) {
+    if (num >= 0) {
         pos = num;
     }
     else if (num < 0) {
@@ -440,7 +460,7 @@ void print_l(char *string) {
         putchar(str[i]);
 }
 
-// format: %[flags][width][.precision][length]type
+// format: %[flags][width][.precision]type
 void my_printf(char *phrase, ...) {
     va_list ap; // initialize list for variables
     va_start(ap, phrase); // intialize variable from first parameter
@@ -539,12 +559,12 @@ void my_printf(char *phrase, ...) {
             // does simple math problem
             if (*phrase == 'm') {
                 char *string = va_arg(ap, char*); // get the next argument
-                print_m(string, plus_flag, left_alignment, zeros, width, precision);
+                print_m(string);
             } 
             // converts int to binary number
             if (*phrase == 'b') {
                 int num = va_arg(ap, int); // get the next argument
-                print_b(num, plus_flag, left_alignment, zeros, width, precision);
+                print_b(num);
             }
             // gets length of string
             if (*phrase == 'l') {
@@ -559,11 +579,3 @@ void my_printf(char *phrase, ...) {
     }
     va_end(ap); // cleanup the va_list
 }
-// int main() {
-//     printf("Normal printf(): \n");
-//     printf("%-10s\n", "left");    
-
-//     printf("Fake printf(): \n");
-//     my_printf("%-10s\n", "left");
-//     return 0;
-// }
