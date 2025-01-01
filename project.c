@@ -2,8 +2,7 @@
 #include <stdarg.h>
 
 
-// next step: if encounter % then go to a section that asks if is %d, %x, %c, or %s and do different things based on that
-// if %d then need to add to the array as a decimal
+// function to get the sign; either plus, minus, or nothing
 char get_sign(int negative, int plus_flag) {
     char sign = '0';
     // get the sign
@@ -32,7 +31,8 @@ void store_numbers(int num, int *index, char * str) {
     str[*index] = '\0'; 
 }
 
-void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, int precision, int space_flag) {
+// function for %d
+void print_d(int num, int plus_flag, int left_alignment, int zeros, int width, int precision, int space_flag) {
     int negative = 0;
     // sizes can only be 10 places anyway
     char str[12]; // later want to turn the int into a str to print each digit individually
@@ -43,21 +43,23 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
         negative = 1; // set negative to 1
         num *= -1; // to turn the rest of the number positive
     }
-    
+
+    // store the numbers in a str array
     store_numbers(num, &index, str);
+    // get if supposed to print a + or -
     char sign = get_sign(negative, plus_flag);
     
     int totalWidth = index;
 
-    // get the number of zeroes needed for precision
-    int addedZeroes = 0;
+    // get the number of zeros needed for precision
+    int addedPrecision = 0;
 
     // get the total number of chars needed for width after the added precision ones
     if (index < precision) {
-        addedZeroes = precision-index;
-        
+        addedPrecision = precision-index;
     }
-    totalWidth += addedZeroes;
+    
+    totalWidth += addedPrecision;
     if (sign != '0') {
         totalWidth++; // add one more width after the sign
     }
@@ -76,7 +78,7 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
         if (space_flag == 1 && sign == '0')
             putchar(' ');
         //if theres precision, add it
-        for (int i=0; i<addedZeroes; i++) {
+        for (int i=0; i<addedPrecision; i++) {
             putchar('0');
         }
         // add the digits
@@ -89,26 +91,26 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
     }
     // for regular
     else {
-        // if zeroes is on and totalWidth is greater than width
-        // order is sign, width zeroes, precision, digits
-        if (zeroes == 1) {
+        // if zeros is on and totalWidth is greater than width
+        // order is sign, width zeros, precision, digits
+        if (zeros == 1 && widthSpaces > 0) {
             // add the sign
             if (sign != '0')
                 putchar(sign);
             // if blank space flag is on and sign == '0', put a space
             if (space_flag == 1 && sign == '0')
                 putchar(' ');
-            // add the rest of the zeroes for width
+            // add the rest of the zeros for width
             for (int i=0; i<widthSpaces; i++)
                 putchar('0');
-            // add the precision zeroes
-            for (int i=0; i<addedZeroes; i++)
+            // add the precision zeros
+            for (int i=0; i<addedPrecision; i++)
                 putchar('0');
             // add the digits
             for (int i = index-1; i >= 0; i--) 
                 putchar(str[i]);
         }
-        // if zeroes is off
+        // if zeros is off
         // order is width spaces, sign, precision, digits
         else {
             // add the blanks for wide
@@ -120,8 +122,8 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
             // if blank space flag is on and sign == '0', put a space
             if (space_flag == 1 && sign == '0')
                 putchar(' ');
-            // add the precision zeroes
-            for (int i=0; i<addedZeroes; i++)
+            // add the precision zeros
+            for (int i=0; i<addedPrecision; i++)
                 putchar('0');
             // add the digits
             for (int i = index-1; i >= 0; i--) 
@@ -129,8 +131,8 @@ void print_d(int num, int plus_flag, int left_alignment, int zeroes, int width, 
         }
     }
 }
-
-void print_c(char character, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
+// %c
+void print_c(char character, int left_alignment, int width) {
     if (left_alignment == 1) {
         putchar(character);
         // deal with width here
@@ -144,8 +146,9 @@ void print_c(char character, int plus_flag, int left_alignment, int zeroes, int 
         putchar(character);
     }
 }
-
-void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
+// %s
+void print_s(char *string, int left_alignment, int width, int precision) {
+    // save the first spot in the string
     char *copy = string;
 
     // get length of the string
@@ -159,17 +162,18 @@ void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int wi
     string = copy;
 
     // if normal alignment
-    // deal with precision
     if (left_alignment == 0) {
+        // precision
         if (precision > 0) {
             // width and precision together
             if (width > precision) {
+                // add diff number of spaces for the width
                 int diff = width-precision;
                 for (int i=0; i<diff; i++)
                     putchar(' ');
             }
         
-            int num = 0; // this is for precision
+            int num = 0; // adding chars, but not more than precision
             while (*string != '\0' && num < precision) {
                 putchar(*string);
                 string++;
@@ -178,9 +182,10 @@ void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int wi
         }
 
         // insert the spaces for width (without precision specified)
-        // update: check if width is greater than precision, not len
         else {
+            // if the width is wider than the length of str
             if (width > len) {
+                // add diff many zeros to meet width
                 int diff = width-len;
                 for (int i=0; i<diff; i++)
                     putchar(' ');
@@ -192,15 +197,17 @@ void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int wi
             }
         }
     }
+    // if left alignment, same steps but chars first
     else {
+        // with precision
         if (precision > 0) {
-            int num = 0; // this is for precision
+            int num = 0; // adding chars, but not more than precision
             while (*string != '\0' && num < precision) {
                 putchar(*string);
                 string++;
                 num++;
             }
-            // width and precision together
+            // add diff many spaces for width
             if (width > precision) {
                 int diff = width-precision;
                 for (int i=0; i<diff; i++)
@@ -208,8 +215,7 @@ void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int wi
             }
         }
 
-        // insert the spaces for width (without precision specified)
-        // update: check if width is greater than precision, not len
+        // if no precision just add the spaces for width
         else {
             // add the letters now
             while (*string != '\0') {
@@ -225,8 +231,7 @@ void print_s(char *string, int plus_flag, int left_alignment, int zeroes, int wi
     }
 }
 
-void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, int width, int precision, int hash_flag, char format) {
-    // sizes can only be 10 places anyway
+void print_x(unsigned int num, int plus_flag, int left_alignment, int zeros, int width, int precision, int hash_flag, char format) {
     char str[12]; // later want to turn the int into a str to print each digit individually
     int index = 0;
 
@@ -238,8 +243,8 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
 
     // have a list of the hex digits
     char hex[16] = "0123456789abcdef";
-    // turn the into a string, but backwards
-    // not using the function because of the hex conversion
+    
+    // not using the function because of the hex conversion // store backwards in list
     while (num > 0) {
         int temp = num % 16;
         // add this digit to the string
@@ -251,7 +256,8 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
 
     // total number of chars involved
     int totalWidth = index;
-        // check if # flag is set
+
+    // check if # flag is set
     if (hash_flag == 1) {
         str[index] = format;
         index++;
@@ -259,19 +265,21 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
         index++;   
         totalWidth += 2;      
     }
-    int addedZeroes = 0;
-    // get the number of zeroes involved for precision
+
+    int addedPrecision = 0;
+    // get the number of zeros involved for precision
     if (index < precision) {
-        addedZeroes = precision-index;
+        addedPrecision = precision-index;
     }
-    totalWidth += addedZeroes;
+    
+    totalWidth += addedPrecision;
     // get the number of spaces we need to add for width after precision
     int widthSpaces = width - totalWidth;
 
     // for left aligned
     if (left_alignment == 1) {
         // add the precision
-        for (int i=0; i<(addedZeroes); i++) {
+        for (int i=0; i<(addedPrecision); i++) {
             putchar('0');
         }
         // add the digits
@@ -287,25 +295,25 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
 
     // over here need to check how many less than width and then put blank spaces
     else {
-        // if zeroes is on and totalWidth is greater than width
-        if (zeroes == 1 && widthSpaces > 0) {
-            // add the rest of the zeroes for width
+        // if zeros is on and totalWidth is greater than width
+        if (zeros == 1 && widthSpaces > 0) {
+            // add the rest of the zeros for width
             for (int i=0; i<widthSpaces; i++)
                 putchar('0');
-            // add the precision zeroes
-            for (int i=0; i<addedZeroes; i++)
+            // add the precision zeros
+            for (int i=0; i<addedPrecision; i++)
                 putchar('0');
             // add the digits
             for (int i = index-1; i >= 0; i--) 
                 putchar(str[i]);
         }
-        // if zeroes is off
+        // if zeros is off
         else {
             // add the blanks for wide
             for (int i=0; i<widthSpaces; i++)
                 putchar(' ');
-            // add the precision zeroes
-            for (int i=0; i<addedZeroes; i++)
+            // add the precision zeros
+            for (int i=0; i<addedPrecision; i++)
                 putchar('0');
             // add the digits
             for (int i = index-1; i >= 0; i--) 
@@ -314,16 +322,16 @@ void print_x(unsigned int num, int plus_flag, int left_alignment, int zeroes, in
     }
 }
 // custom %m type which treats the argument as a math expression
-void print_m(char *string, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
-    //printf("%d\n", 2+3)
-    // while it's a number, get the number
+// sample format: printf("%d\n", 2+3)
+void print_m(char *string, int plus_flag, int left_alignment, int zeros, int width, int precision) {
+
     int num1 = 0;
     int num2 = 0;
     char addOrMinus = '\0';
     char str[12];
 
+    // while it's a number, get it and it and add it to num1
     while (*string >= '0' && *string <= '9') {
-        // get the int 
         num1 = (num1 * 10) + *string - '0';
         string++;
     }
@@ -336,14 +344,14 @@ void print_m(char *string, int plus_flag, int left_alignment, int zeroes, int wi
         addOrMinus = '*';
     string++;
 
-    // while its a number
+    // while it's a number, get it and it and add it to num2
     while (*string >= '0' && *string <= '9') {
         // get the int 
         num2 = (num2 * 10) + *string - '0';
         string++;
     }
-    int ret = 0;
-    // do the math and store the answer in ret
+    int ret = 0; 
+    // do the math with right operation and store the answer in ret
     if (addOrMinus == '+')
         ret = num1+num2;
     else if (addOrMinus == '-')
@@ -352,14 +360,16 @@ void print_m(char *string, int plus_flag, int left_alignment, int zeroes, int wi
         ret = num1 * num2;
     
     int index = 0;
+    // store numbers in a str array
     store_numbers(ret, &index, str);
 
+    // now need to print out the numbers one by one in reverse stored order
     for (int i = index-1; i >= 0; i--) 
         putchar(str[i]);
-    // now need to print out the numbers one by one
+    
 }
-
-void print_b(int num, int plus_flag, int left_alignment, int zeroes, int width, int precision) {
+// custom %b which converts the int into a binary number, including 2's complement
+void print_b(int num, int plus_flag, int left_alignment, int zeros, int width, int precision) {
     // max is 32 bit
     char str[32];
     int index = 0;
@@ -387,7 +397,7 @@ void print_b(int num, int plus_flag, int left_alignment, int zeroes, int width, 
         str[i] = '0';
     }
 
-    // if num is negative, need twos complement
+    // if num is negative, need two's complement
     if (num < 0) {
         // flip the bits
         for (int i=0; i<32; i++) {
@@ -419,6 +429,7 @@ void print_l(char *string) {
     char str[12]; // later want to turn the int into a str to print each digit individually
     int index = 0;
     int len = 0;
+    // get the length of the string
     while (*string != '\0') {
         len++;
         string++;
@@ -429,14 +440,14 @@ void print_l(char *string) {
         putchar(str[i]);
 }
 
+// format: %[flags][width][.precision][length]type
 void my_printf(char *phrase, ...) {
     va_list ap; // initialize list for variables
-    va_start(ap, phrase);
+    va_start(ap, phrase); // intialize variable from first parameter
     while (*phrase != '\0') {
         if (*phrase == '%') {
             phrase++; // to get the flag or modifier or type...
-            // %[flags][width][.precision][length]type
-            // flags are -, +, , 0, ', #
+            // flags are -, +, , 0, #
             int plus_flag = 0;
             if (*phrase == '+') {
                 plus_flag = 1;
@@ -451,10 +462,10 @@ void my_printf(char *phrase, ...) {
             }
 
             // zero flag
-            int zeroes = 0;
+            int zeros = 0;
             // check if 0 and then do zeros instead of spaces
             if (*phrase == '0') {
-                zeroes = 1;
+                zeros = 1;
                 phrase++;
             }
 
@@ -473,7 +484,6 @@ void my_printf(char *phrase, ...) {
             }
 
             // width field the number is the minimum number of chars in output
-            // get the number to be used later
             int width = 0;
             // first check if is a star (*), if so- get the next argument
             if (*phrase == '*') {
@@ -505,35 +515,38 @@ void my_printf(char *phrase, ...) {
                 }
             }
 
-
+            // prints as an int
             if (*phrase == 'd') {
                 int num = va_arg(ap, int); // get the next argument
-                print_d(num, plus_flag, left_alignment, zeroes, width, precision, space_flag);
+                print_d(num, plus_flag, left_alignment,  zeros, width, precision, space_flag);
             }     
             // prints it as a char
             if (*phrase == 'c') {
-                char character = va_arg(ap, int); // get the next argument, the parameter is an int idk why can ask that
-                print_c(character, plus_flag, left_alignment, zeroes, width, precision);
+                char character = va_arg(ap, int); // get the next argument
+                print_c(character, left_alignment, width);
             }
-            // s should be the same thing just multiple character so will move through it and print one by one
+            // prints a string
             if (*phrase == 's') {
                 char *string = va_arg(ap, char*); // get the next argument
-                print_s(string, plus_flag, left_alignment, zeroes, width, precision);
+                print_s(string, left_alignment, width, precision);
             } 
                 
-            // if x: unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case.
+            // unsigned int as a hexadecimal number. x uses lower-case letters and X uses upper-case.
             if (*phrase == 'x' || *phrase == 'X') {
                 unsigned int num = va_arg(ap, int); // get the next argument, the parameter is an int idk why can ask that
-                print_x(num, plus_flag, left_alignment, zeroes, width, precision, hash_flag, *phrase);
+                print_x(num, plus_flag, left_alignment, zeros, width, precision, hash_flag, *phrase);
             }
+            // does simple math problem
             if (*phrase == 'm') {
                 char *string = va_arg(ap, char*); // get the next argument
-                print_m(string, plus_flag, left_alignment, zeroes, width, precision);
+                print_m(string, plus_flag, left_alignment, zeros, width, precision);
             } 
+            // converts int to binary number
             if (*phrase == 'b') {
                 int num = va_arg(ap, int); // get the next argument
-                print_b(num, plus_flag, left_alignment, zeroes, width, precision);
+                print_b(num, plus_flag, left_alignment, zeros, width, precision);
             }
+            // gets length of string
             if (*phrase == 'l') {
                 char *string = va_arg(ap, char*); // get the next argument
                 print_l(string);
@@ -547,6 +560,10 @@ void my_printf(char *phrase, ...) {
     va_end(ap); // cleanup the va_list
 }
 // int main() {
+//     printf("Normal printf(): \n");
+//     printf("%-10s\n", "left");    
 
+//     printf("Fake printf(): \n");
+//     my_printf("%-10s\n", "left");
 //     return 0;
 // }
