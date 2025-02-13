@@ -364,7 +364,7 @@ void print_m(char *string) {
     }
 
     // division by 0;
-    if (num2 == 0) {
+    if ((num2 == 0) && (operator == '/')){
         handle_error();
         return;
     }
